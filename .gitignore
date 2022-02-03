@@ -1,0 +1,14 @@
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+RTITracker/
+
+# Config
+config.toml
+
+# Aerich Migrations
+migrations/
