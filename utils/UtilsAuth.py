@@ -55,4 +55,3 @@ def CreateAccessToken(data: dict, expires_delta: Optional[timedelta] = None):
         to_encode, config["jwt"]["key"], algorithm=config["jwt"]["algorithm"]
     )
     return encoded_jwt
-

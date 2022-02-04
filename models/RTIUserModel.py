@@ -35,6 +35,7 @@ class User(models.Model):
             "updated_on",
         ]
 
+
 ##############################
 ##### PYDANCTIC SCHEMAS ######
 ##############################
