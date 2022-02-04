@@ -1,8 +1,10 @@
+from typing import Optional
+
 from tortoise.contrib.pydantic.base import PydanticModel
 from pydantic import BaseModel
 
 class CreateRTIIn(BaseModel):
-    nameOfRTI: str
+    nameOfRti: str
     whenWasRtiFiled: str # epoch
     isFirst: bool
     isLast: bool
@@ -11,12 +13,12 @@ class CreateRTIIn(BaseModel):
     isPending: bool
     fileType: str
     fileName: str
-    nextRTI: str
-    prevRTI: str
+    nextRTI: Optional[str]
+    prevRTI: Optional[str]
 
 
 class UpdateRTIIn(BaseModel):
-    nameOfRTI: str
+    nameOfRti: str
     whenWasRtiFiled: str # epoch
     isFirst: bool
     isLast: bool
@@ -25,5 +27,5 @@ class UpdateRTIIn(BaseModel):
     isPending: bool
     fileType: str
     fileName: str
-    nextRTI: str
-    prevRTI: str
+    nextRTI: Optional[str]
+    prevRTI: Optional[str]

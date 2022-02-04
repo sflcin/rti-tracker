@@ -25,7 +25,7 @@ class RTI(models.Model):
     isForwarded = fields.BooleanField(default=False)
     isDenied = fields.BooleanField(default=False)
     isPending = fields.BooleanField(default=False)
-    fileType = fields.CharField(default="", max_length=500, null=False)
+    fileType = fields.CharField(default="PDF", max_length=3, null=False)
 
     # extensions should be .pdf | .png
     # make a check in the frontend, there will also be a check in backend

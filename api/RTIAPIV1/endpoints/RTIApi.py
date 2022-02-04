@@ -18,13 +18,13 @@ from utils.Dependencies import (
 
 router = APIRouter()
 
-@router.post("/create/")
-async def create_post(
+@router.post("/create")
+async def createRTI(
     content: RTICreateRtiSchema.CreateRTIIn, current_user: User = Depends(get_current_active_user)
 ):
     _whenWasRtiFiled = datetime.fromtimestamp(int(content.whenWasRtiFiled))
     RTIObj = await RTI.create(
-        nameOfRTI = content.nameOfRTI,
+        nameOfRti = content.nameOfRti,
         whenWasRtiFiled = _whenWasRtiFiled,
         isFirst = content.isFirst,
         isLast = content.isLast,
