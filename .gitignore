@@ -10,5 +10,8 @@ RTITracker/
 # Config
 config.toml
 
+# VSCode files
+.vscode/
+
 # Aerich Migrations
 migrations/
