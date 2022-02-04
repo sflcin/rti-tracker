@@ -43,8 +43,8 @@ app.add_middleware(
 # and it states TRUTH
 @app.get("/RTIApiv1/hello")
 async def test_api():
-    """Test Api call. Should return {"JS":"Sucks:}"""
-    return {"JS": "Sucks"}
+    """Test Api call. Should return {"RTI":"Tracker"}"""
+    return {"RTI":"Tracker"}
 
 app.include_router(RTIMotherRouterOfRouters, prefix="/RTIApiv1")
 
