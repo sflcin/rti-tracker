@@ -41,9 +41,16 @@ app.add_middleware(
 # This is a test api function
 # Don't remove
 # and it states TRUTH
-@app.get("/RTIApiv1/hello")
-async def test_api():
-    """Test Api call. Should return {"RTI":"Tracker"}"""
+@app.get(
+    "/RTIApiv1/hello",
+    summary="Test Api Call"
+)
+async def TestApi():
+    """
+    Test API
+
+    :returns: {"RTI": "Tracker"}
+    """
     return {"RTI": "Tracker"}
 
 

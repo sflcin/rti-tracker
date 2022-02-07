@@ -19,12 +19,13 @@ from utils.Dependencies import (
 router = APIRouter()
 
 
-@router.get("/get/{limit}")
+@router.get("/get/{limit}", summary="Get either all RTIs or limited RTIs")
 async def getAllRTI(limit: Union[int, str]):
     """
-    Get limited RTIs from the DB IFF `limit`: int,
-    `limit`: str = "all" will result in all RTIs.
-    This will also give total number of RTIs.
+    :param limit: can be "all" or a number (>0)
+    :returns: limited number of RTIs if `limit` is a number
+    :returns: all RTIs if `limit` is "all"
+    :raises HTTPException: if `limit` != number | "all"
     """
     allRTIDict = dict()
 
@@ -53,10 +54,12 @@ async def getAllRTI(limit: Union[int, str]):
     return allRTIDict
 
 
-@router.get("/get/id/{id}")
+@router.get("/get/id/{id}", summary="Get RTI by its ID")
 async def getRTIById(id: str):
     """
-    Get RTI by id
+    :param id: UUID assigned to the RTI object
+    :returns: the whole RTI object except the uploader, createdOn, and updatedOn field
+    :raises HTTPException: if `id` isn't valid
     """
     if not await RTI.exists(id=id):
         raise HTTPException(
@@ -73,13 +76,15 @@ async def getRTIById(id: str):
     return RTIObjDict
 
 
-@router.post("/create")
+@router.post("/create", summary="Create a RTI")
 async def createRTI(
     content: RTICreateRtiSchema.CreateRTIIn,
     current_user: User = Depends(get_current_active_user),
 ):
     """
-    Create RTI, this will return the whole object
+    :param content: CreateRTIIn
+    :returns: the whole RTI object except the uploader, createdOn, and updatedOn field
+    :raises HTTPException: if RTIInfo table isn't initialized OR there's no field with id=0
     """
     _whenWasRtiFiled = datetime.fromtimestamp(int(content.whenWasRtiFiled))
     RTIObj = await RTI.create(
@@ -116,16 +121,23 @@ async def createRTI(
 
     await RTIObj.save()
 
-    return RTIObj
+    RTIObjDict = dict(RTIObj)
+    for itemsToBePopped in ["createdOn", "updatedOn", "uploadedBy_id"]:
+        RTIObjDict.pop(itemsToBePopped)
+
+    return RTIObjDict
 
 
-@router.post("/update")
+@router.patch("/update", summary="Update a RTI")
 async def updateRTI(
     content: RTIUpdateRtiSchema.UpdateRTIIn,
     current_user: User = Depends(get_current_active_user),
 ):
     """
-    Update RTI, this will return the whole object
+    :param content: UpdateRTIIn
+    :returns: the whole RTI object except the uploader, createdOn, and updatedOn field
+    :raises HTTPException: if RTIInfo table isn't initialized OR there's no field with id=0
+    :raises HTTPException: if id provided isn't valid
     """
     if not await RTI.exists(id=content.id):
         raise HTTPException(
@@ -158,4 +170,37 @@ async def updateRTI(
 
     await RTIObj.save()
 
-    return RTIObj
+    RTIObjDict = dict(RTIObj)
+    for itemsToBePopped in ["createdOn", "updatedOn", "uploadedBy_id"]:
+        RTIObjDict.pop(itemsToBePopped)
+
+    return RTIObjDict
+
+
+@router.delete("/delete/id/{id}", summary="Delete a RTI")
+async def deleteRTI(id: str):
+    """
+    :param id: UUID assigned to the RTI object
+    :returns: None
+    :raises HTTPException: if id provided isn't valid
+    :raises HTTPException: if RTIInfo table isn't initialized OR there's no field with id=0
+    """
+    if not await RTI.exists(id=id):
+        raise HTTPException(
+            status_code=404, detail="No RTI found with the provided ID!"
+        )
+
+    RTIObj = await RTI.get(id=id)
+    await RTIObj.delete()
+
+    if not await RTIInfo.exists(id=0):
+        raise HTTPException(
+            status_code=404, detail="RTI info table doesn't have '0' id row!"
+        )
+
+    RTIInfoObj = await RTIInfo.get(id=0)
+    if RTIObj.stateOfRti == RTIStateEnum.RTIStateNew:
+        RTIInfoObj.totalNumOfRTI -= 1
+        RTIInfoObj.totalNumOfPendingRTI -= 1
+    if RTIObj.stateOfRti == RTIStateEnum.RTIStateComplete:
+        RTIInfoObj.totalNumOfCompleteRTI -= 1
